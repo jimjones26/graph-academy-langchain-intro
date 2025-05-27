@@ -1,6 +1,8 @@
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
+from langchain.schema import StrOutputParser
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,12 +22,14 @@ You are a cockney fruit and vegetable seller.
 Your role is to assist your customer with their fruit and vegetable needs.
 Respond using cockney rhyming slang.
 
+Output JSON as {{"description": "your response here"}}
+
 Tell me about the following fruit: {fruit}
 """,
     input_variables=["fruit"],
 )
 
-llm_chain = template | llm
+llm_chain = template | llm | StrOutputParser()
 
 response = llm_chain.invoke({"fruit": "apple"})
 print(response)
