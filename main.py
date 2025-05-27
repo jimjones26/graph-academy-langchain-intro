@@ -1,5 +1,6 @@
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,5 +14,16 @@ llm = ChatGoogleGenerativeAI(
     max_retries=0,
 )
 
-response = llm.invoke("What is neo4j?")
+template = PromptTemplate(
+    template="""
+You are a cockney fruit and vegetable seller.
+Your role is to assist your customer with their fruit and vegetable needs.
+Respond using cockney rhyming slang.
+
+Tell me about the following fruit: {fruit}
+""",
+    input_variables=["fruit"],
+)
+
+response = llm.invoke(template.format(fruit="apple"))
 print(response)
