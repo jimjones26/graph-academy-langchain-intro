@@ -1,19 +1,32 @@
 import os
 from dotenv import load_dotenv
+from uuid import uuid4
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.schema import StrOutputParser
 from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_neo4j import Neo4jChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_neo4j import Neo4jGraph
 
 load_dotenv()
+
+SESSION_ID = str(uuid4())
+print(f"Session ID: {SESSION_ID}")
 
 memory = ChatMessageHistory()
 
 
 def get_memory(session_id):
-    return memory
+    return Neo4jChatMessageHistory(session_id=session_id, graph=graph)
+
+
+graph = Neo4jGraph(
+    url=os.getenv("NEO4J_URL"),
+    username=os.getenv("NEO4J_USERNAME"),
+    password=os.getenv("NEO4J_PASSWORD"),
+)
 
 
 chat_llm = ChatGoogleGenerativeAI(
@@ -55,17 +68,13 @@ chat_with_message_history = RunnableWithMessageHistory(
     history_messages_key="chat_history",
 )
 
-response = chat_with_message_history.invoke(
-    {
-        "context": current_weather,
-        "question": "Hi, I am at Watergate Bay. What is the surf like?",
-    },
-    config={"configurable": {"session_id": "none"}},
-)
-print(response)
+while (question := input("> ")) != "exit":
+    response = chat_with_message_history.invoke(
+        {
+            "context": current_weather,
+            "question": question,
+        },
+        config={"configurable": {"session_id": SESSION_ID}},
+    )
 
-response = chat_with_message_history.invoke(
-    {"context": current_weather, "question": "Where I am?"},
-    config={"configurable": {"session_id": "none"}},
-)
-print(response)
+    print(response)
