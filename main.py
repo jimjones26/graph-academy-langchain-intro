@@ -1,7 +1,7 @@
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain.schema import StrOutputParser
+from langchain.output_parsers.json import SimpleJsonOutputParser
 
 from dotenv import load_dotenv
 
@@ -29,7 +29,7 @@ Tell me about the following fruit: {fruit}
     input_variables=["fruit"],
 )
 
-llm_chain = template | llm | StrOutputParser()
+llm_chain = template | llm | SimpleJsonOutputParser()
 
 response = llm_chain.invoke({"fruit": "apple"})
 print(response)
