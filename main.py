@@ -25,5 +25,7 @@ Tell me about the following fruit: {fruit}
     input_variables=["fruit"],
 )
 
-response = llm.invoke(template.format(fruit="apple"))
+llm_chain = template | llm
+
+response = llm_chain.invoke({"fruit": "apple"})
 print(response)
