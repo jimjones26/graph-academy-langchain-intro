@@ -4,3 +4,4 @@ langchain-neo4j
 langchainhub
 neo4j
 langchain-google-genai
+openai
