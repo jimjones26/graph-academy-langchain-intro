@@ -9,12 +9,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain.schema import StrOutputParser
 from langchain_neo4j import Neo4jChatMessageHistory, Neo4jGraph
+from langchain_community.tools import YouTubeSearchTool
 from uuid import uuid4
 
 load_dotenv()
 
 SESSION_ID = str(uuid4())
 print(f"Session ID: {SESSION_ID}")
+
+youtube = YouTubeSearchTool()
 
 llm = ChatGoogleGenerativeAI(
     api_key=os.getenv("GOOGLE_API_KEY"),
@@ -45,12 +48,22 @@ def get_memory(session_id):
     return Neo4jChatMessageHistory(session_id=session_id, graph=graph)
 
 
+def call_trailer_search(input):
+    input = input.replace(",", " ")
+    return youtube.run(input)
+
+
 tools = [
     Tool.from_function(
         name="Movie Chat",
         description="For when you need to chat about movies. The question will be a string. Return a string.",
         func=movie_chat.invoke,
-    )
+    ),
+    Tool.from_function(
+        name="Movie Trailer Search",
+        description="Use when needing to find a movie trailer. The question will include the word trailer. Return a link to a YouTube video.",
+        func=call_trailer_search,
+    ),
 ]
 
 agent_prompt = hub.pull("hwchase17/react-chat")
