@@ -5,3 +5,4 @@ langchainhub
 neo4j
 langchain-google-genai
 openai
+youtube-search
