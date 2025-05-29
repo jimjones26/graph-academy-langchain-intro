@@ -4,7 +4,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
